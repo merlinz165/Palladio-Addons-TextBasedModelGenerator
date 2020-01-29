@@ -59,4 +59,17 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <gradle.executable>gradlew.bat</gradle.executable>
+            </properties>
+        </profile>
+    </profiles>
 </project>
