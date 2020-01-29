@@ -1,0 +1,97 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.node-gradle:gradle-node-plugin:2.2.0"
+    }
+}
+
+apply plugin: "com.github.node-gradle.node"
+
+
+import com.mgd.core.gradle.*
+
+node {
+    download = true
+}
+
+// Custom variables
+def vs_project = "vscode-palladio"
+def lsFromDir = "$rootProject.projectDir/../target/palladio-languageserver"
+def lsToDir = "build/palladio-languageserver"
+def vsExtensionDestDir = "$rootProject.projectDir/../target/vscode"
+def vsExtensionName = "palladio-languageserver.vsix"
+def build_date = new Date().format('yyyyMMddHHmmss')
+
+// Copy xtext language server to VS work dir
+task copyApplication(type: Sync) {
+    from lsFromDir
+    into lsToDir
+}
+
+npmInstall.dependsOn copyApplication
+
+// Install vsce
+task npmInstallVsce(type: NpmTask, dependsOn: npmSetup) {
+    ext.destPath = "$rootProject.projectDir/node_modules/vsce"
+    outputs.dir(destPath)
+    group 'Node'
+    description 'Installs the NodeJS package "Visual Studio Code Extension Manager"'
+    args = [ 'install', 'vsce' ]
+}
+
+def inputFiles = fileTree(
+    dir: projectDir,
+    excludes: [ 'out/**', '.gitignore', '.gradle/**', 'build/**', '*.gradle' ]
+)
+
+npmInstall {
+    inputs.files(inputFiles)
+    outputs.dir('out')
+}
+
+
+task packageVSExtension(dependsOn: [npmInstall, npmInstallVsce], type: NodeTask) {
+    ext.destDir = new File(buildDir, 'vscode')
+    ext.archiveName = "$project.name-${project.version}_${build_date}.vsix"
+    ext.destPath = "$destDir/$archiveName"
+    inputs.with {
+        files inputFiles
+        dir npmInstallVsce.destPath
+    }
+    outputs.dir destDir
+    doFirst {
+        destDir.mkdirs()
+    }
+    script = file("$npmInstallVsce.destPath/out/vsce")
+    args = [ 'package', '--out', destPath ]
+    execOverrides {
+        workingDir = projectDir
+    }
+}
+
+task copyVSExtensionToTarget(type: Copy, dependsOn: packageVSExtension) {
+    from (packageVSExtension.destDir)
+    include packageVSExtension.archiveName
+    destinationDir file("$vsExtensionDestDir/")
+    rename "$packageVSExtension.archiveName", "$vsExtensionName"
+    doLast {
+        delete packageVSExtension.destDir
+        delete 'out'
+        delete copyApplication.outputs
+        delete buildDir
+    }
+}
+
+task clean {
+    doLast {
+        delete packageVSExtension.destDir
+        delete 'out'
+        delete copyApplication.outputs
+        delete buildDir
+    }
+}
