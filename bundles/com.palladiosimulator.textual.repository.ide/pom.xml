@@ -149,7 +149,7 @@
                             <goal>assemble</goal>
                         </goals>
                         <configuration>
-                            <assembleDirectory>${project.build.directory}/palladio-languageserver</assembleDirectory>
+                            <assembleDirectory>${project.build.directory}/../../../target/palladio-languageserver</assembleDirectory>
                             <repositoryLayout>flat</repositoryLayout>
                             <useWildcardClassPath>true</useWildcardClassPath>
                             <!-- uncomment to enable remote debugging
