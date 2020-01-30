@@ -8,3 +8,6 @@ node_modules
 
 # Ignore Gradle build output directory
 build
+
+# do not ignore gradle wrapper file.
+!gradle-wrapper.jar
