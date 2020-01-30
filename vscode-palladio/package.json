@@ -57,7 +57,8 @@
         "mocha": "^6.2.2",
         "typescript": "^3.6.4",
         "tslint": "^5.20.0",
-        "vscode-test": "^1.2.2"
+        "vscode-test": "^1.2.2",
+        "yarn": "^1.21.1"
     },
     "dependencies": {
         "vscode-languageclient": "^6.1.0"
