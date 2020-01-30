@@ -61,7 +61,6 @@
         "yarn": "^1.21.1"
     },
     "dependencies": {
-        "vsce": "^1.71.0",
         "vscode-languageclient": "^6.1.0"
     }
 }
