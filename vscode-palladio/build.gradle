@@ -79,12 +79,6 @@ task copyVSExtensionToTarget(type: Copy, dependsOn: packageVSExtension) {
     include packageVSExtension.archiveName
     destinationDir file("$vsExtensionDestDir/")
     rename "$packageVSExtension.archiveName", "$vsExtensionName"
-    doLast {
-        delete 'out'
-        delete buildDir
-        delete 'node_modules'
-        delete '.gradle'
-    }
 }
 
 task clean {
